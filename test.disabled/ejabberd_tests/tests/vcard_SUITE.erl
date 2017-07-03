@@ -966,38 +966,38 @@ prepare_vcards(Config) ->
 prepare_vcard(ldap, JID, Fields) ->
     [User, Server] = binary:split(JID, <<"@">>),
     {EPid, Base} = get_ldap_pid_and_base(Server),
-    VCardMap = [{<<"NICKNAME">>, <<"%u">>, []},
-                {<<"FN">>, <<"%s">>, [<<"displayName">>]},
-                {<<"FAMILY">>, <<"%s">>, [<<"sn">>]},
-                {<<"GIVEN">>, <<"%s">>, [<<"givenName">>]},
-                {<<"MIDDLE">>, <<"%s">>, [<<"initials">>]},
-                {<<"ORGNAME">>, <<"%s">>, [<<"o">>]},
-                {<<"ORGUNIT">>, <<"%s">>, [<<"ou">>]},
+    VCardMap = [{"NICKNAME", "%u", []},
+                {"FN", "%s", ["displayName"]},
+                {"FAMILY", "%s", ["sn"]},
+                {"GIVEN", "%s", ["givenName"]},
+                {"MIDDLE", "%s", ["initials"]},
+                {"ORGNAME", "%s", ["o"]},
+                {"ORGUNIT", "%s", ["ou"]},
 
                 %{<<"CTRY">>, <<"%s">>, [<<"c">>]},
-                {<<"LOCALITY">>, <<"%s">>, [<<"l">>]},
-                {<<"STREET">>, <<"%s">>, [<<"street">>]},
-                {<<"REGION">>, <<"%s">>, [<<"st">>]},
+                {"LOCALITY", "%s", ["l"]},
+                {"STREET", "%s", ["street"]},
+                {"REGION", "%s", ["st"]},
 
-                {<<"PCODE">>, <<"%s">>, [<<"postalCode">>]},
-                {<<"TITLE">>, <<"%s">>, [<<"title">>]},
-                {<<"URL">>, <<"%s">>, [<<"labeleduri">>]},
-                {<<"DESC">>, <<"%s">>, [<<"description">>]},
-                {<<"TEL">>, <<"%s">>, [<<"telephoneNumber">>]},
-                {<<"NUMBER">>, <<"%s">>, [<<"telephoneNumber">>]},
+                {"PCODE", "%s", ["postalCode"]},
+                {"TITLE", "%s", ["title"]},
+                {"URL", "%s", ["labeleduri"]},
+                {"DESC", "%s", ["description"]},
+                {"TEL", "%s", ["telephoneNumber"]},
+                {"NUMBER", "%s", ["telephoneNumber"]},
 
-                {<<"EMAIL">>, <<"%s">>, [<<"mail">>]},
-                {<<"USERID">>, <<"%s">>, [<<"mail">>]},
+                {"EMAIL", "%s", ["mail"]},
+                {"USERID", "%s", ["mail"]},
 %%                 {<<"BDAY">>, <<"%s">>, [<<"birthDay">>]}, %OpenLDAP doesn't sport it by default
-                {<<"ROLE">>, <<"%s">>, [<<"employeeType">>]},
-                {<<"PHOTO">>, <<"%s">>, [<<"jpegPhoto">>]}
+                {"ROLE", "%s", ["employeeType"]},
+                {"PHOTO", "%s", ["jpegPhoto"]}
     ],
     Fun = fun(Field, Val) ->
         case vcard_field_to_ldap(VCardMap, Field) of
             undefined ->
                 undefined;
             LdapField ->
-                escalus_ejabberd:rpc(eldap, mod_replace, [binary_to_list(LdapField), [binary_to_list(Val)]])
+                escalus_ejabberd:rpc(eldap, mod_replace, [LdapField, [Val]])
         end
     end,
     Modificators = convert_vcard_fields(Fields, [], Fun),
